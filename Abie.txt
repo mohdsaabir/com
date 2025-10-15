@@ -85,3 +85,22 @@ int main() {
 
     return 0;
 }
+
+
+
+no of alpha 3
+0 1 e
+no of states
+3 
+no of transitions
+5
+
+101
+1e2
+212
+2e3
+303
+
+q1,q2,q3
+q2,q3
+q3
