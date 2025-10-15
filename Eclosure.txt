@@ -1,0 +1,78 @@
+#include <stdio.h>
+
+#define MAX 20
+
+int nStates, nAlpha, nTrans;
+char alpha[MAX];
+int trans[MAX][MAX][MAX] = {0}; // trans[from][symbolIndex][k] = to
+int transCount[MAX][MAX] = {0}; // number of transitions per symbol
+//eclosure core logic
+void epsilonClosure(int start, int closure[], int epsIndex) {
+    int stack[MAX], top = 0;
+    stack[top++] = start;
+    closure[start] = 1;
+
+    while (top) {
+        int s = stack[--top];
+        for (int i = 0; i < transCount[s][epsIndex]; i++) {
+            int next = trans[s][epsIndex][i];
+            if (!closure[next]) {
+                closure[next] = 1;
+                stack[top++] = next;
+            }
+        }
+    }
+}
+//index of symbol
+int getAlphaIndex(char c) {
+    for (int i = 0; i < nAlpha; i++)
+        if (alpha[i] == c) return i;
+    return -1;
+}
+
+int main() {
+    printf("Enter number of alphabets:\n");
+    scanf("%d", &nAlpha); 
+    getchar();
+    printf("NOTE: [use letter e as epsilon, e must be last if present]\n");
+    printf("Enter alphabets:\n");
+    for (int i = 0; i < nAlpha; i++) { 
+        alpha[i] = getchar(); 
+        getchar(); 
+    }
+
+    printf("Enter number of states:\n");
+    scanf("%d", &nStates);
+    printf("Enter number of transitions:\n");
+    scanf("%d", &nTrans);
+    printf("Enter transitions (qfrom symbol qto):\n");
+
+    for (int i = 0; i < nTrans; i++) {
+        int from, to; 
+        char sym;
+        scanf("%d %c %d", &from, &sym, &to);
+        int idx = getAlphaIndex(sym);
+        if (idx == -1) 
+            continue;
+        trans[from][idx][transCount[from][idx]++] = to;
+    }
+
+    printf("\nE-closure of states:\n--------------------------\n");
+    int epsIndex = (alpha[nAlpha - 1] == 'e') ? nAlpha - 1 : -1;
+    //printing & logic
+    for (int s = 1; s <= nStates; s++) {
+        int closure[MAX] = {0};
+        if (epsIndex != -1) 
+            epsilonClosure(s, closure, epsIndex);
+        else 
+            closure[s] = 1;
+        printf("\ne-closure(q%d): {", s);
+        for (int i = 1; i <= nStates; i++)
+            if (closure[i]) 
+                printf("q%d,", i);
+        printf("}");
+    }
+    return 0;
+}
+
+

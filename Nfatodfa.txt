@@ -1,0 +1,122 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 20
+//declaration
+int nStates, nAlphabets, nTrans, nFinals, start; 
+char alph[MAX];
+int finals[MAX], trans[MAX][MAX][MAX], tcount[MAX][MAX]; 
+int dfa[MAX][MAX], dfaCount = 0; 
+//  To check if a dfa state already exists
+int same(int a[], int b[]) {
+    for (int i = 0; i < nStates; i++) 
+        if (a[i] != b[i]) 
+            return 0;
+    return 1;
+}
+//  To add new dfa state
+int addState(int s[]) {
+    for (int i = 0; i < dfaCount; i++) 
+        if (same(s, dfa[i])) 
+            return i;
+    for (int i = 0; i < nStates; i++) 
+        dfa[dfaCount][i] = s[i];
+    return dfaCount++;
+}
+//  To print dfa state
+void printState(int s[]) {
+    printf("{"); 
+    for (int i = 0; i < nStates; i++) 
+        if (s[i]) 
+            printf("q%d,", i + 1); 
+    printf("}\t");
+}
+//  To check if a dfa state is a final state
+int isFinal(int s[]) {
+    for (int i = 0; i < nStates; i++) 
+        if (s[i])
+            for (int j = 0; j < nFinals; j++) 
+                if (i == finals[j]) 
+                    return 1;
+    return 0;
+}
+//  main function
+int main() {
+    //reading inputs
+    printf("Enter No of alphabets and alphabet(s)?\n");
+    scanf("%d", &nAlphabets); 
+    getchar();
+    for (int i = 0; i < nAlphabets; i++) { 
+        alph[i] = getchar(); 
+        getchar(); 
+    }
+    printf("Enter the number of states?\n"); 
+    scanf("%d", &nStates);
+    printf("Enter the start state?\n"); 
+    scanf("%d", &start); 
+    start--;
+    printf("Enter the number of final states?\n"); 
+    scanf("%d", &nFinals);
+    printf("Enter the final states?\n");
+    for (int i = 0; i < nFinals; i++) { 
+        scanf("%d", &finals[i]); 
+        finals[i]--; 
+    }
+    printf("Enter no of transition?\n"); 
+    scanf("%d", &nTrans);
+    printf("NOTE: Transition is in the form-> qno alphabet qno\nNOTE: States number must be greater than zero\n");
+    printf("Enter transition?\n");
+    for (int i = 0; i < nTrans; i++) {
+        int from, to; 
+        char ch; 
+        scanf("%d %c %d", &from, &ch, &to);
+        from--; 
+        to--;
+        for (int a = 0; a < nAlphabets; a++)
+            if (alph[a] == ch) 
+                trans[from][a][tcount[from][a]++] = to;
+    }
+    //main logic of dfa transition table
+    int startSet[MAX] = {0}; 
+    startSet[start] = 1; 
+    addState(startSet);
+    printf("Equivalent DFA.....\n..............\nTransitions of DFA\n\n");
+
+    for (int i = 0; i < dfaCount; i++) {
+        for (int a = 0; a < nAlphabets; a++) {
+            int next[MAX] = {0};
+            for (int s = 0; s < nStates; s++)
+                if (dfa[i][s])
+                    for (int t = 0; t < tcount[s][a]; t++)
+                        next[trans[s][a][t]] = 1;
+            int empty = 1;
+            for (int k = 0; k < nStates; k++) 
+                if (next[k]) { 
+                    empty = 0; 
+                    break; 
+                }
+            if (!empty) 
+                addState(next);
+            printState(dfa[i]); 
+            printf("%c\t", alph[a]);
+            if (empty) 
+                printf("NULL\n"); 
+            else { 
+                printState(next); 
+                printf("\n"); 
+            }
+        }
+    }
+    //printing certain outputs
+    printf("\nStates of DFA:\n");
+    for (int i = 0; i < dfaCount; i++) 
+        printState(dfa[i]);
+    printf("\nAlphabets:\n");
+    for (int i = 0; i < nAlphabets; i++) 
+        printf("%c\t", alph[i]);
+    printf("\n Start State:\nq%d\nFinal states:\n", start + 1);
+    for (int i = 0; i < dfaCount; i++) 
+        if (isFinal(dfa[i])) 
+            printState(dfa[i]);
+    printf("\n");
+}
+
