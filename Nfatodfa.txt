@@ -120,3 +120,31 @@ int main() {
     printf("\n");
 }
 
+
+
+2
+a
+b
+3 no of states
+satrt state 1
+no of final 1
+final state 4
+
+1a1
+1a2
+2b3
+3a3
+
+q1. a. q1q2
+q1 b.  null
+q1q2. a. q1q2
+q1q2. b. q3
+q3. a. q3
+q3. b. null
+
+q1  q1q2. q3
+
+ab
+
+q1
+q3
